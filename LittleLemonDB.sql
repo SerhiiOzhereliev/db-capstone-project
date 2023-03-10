@@ -25,7 +25,7 @@ DROP TABLE IF EXISTS `bookings`;
 CREATE TABLE `bookings` (
   `booking_id` int NOT NULL,
   `table_no` int NOT NULL,
-  `booking_date` date NOT NULL,
+  `Booking_date` datetime DEFAULT NULL,
   `customer_id` int NOT NULL,
   `staff_id` int NOT NULL,
   PRIMARY KEY (`booking_id`),
@@ -42,6 +42,7 @@ CREATE TABLE `bookings` (
 
 LOCK TABLES `bookings` WRITE;
 /*!40000 ALTER TABLE `bookings` DISABLE KEYS */;
+INSERT INTO `bookings` VALUES (1,12,'2023-01-01 19:00:00',1,1),(2,12,'2023-01-02 19:00:00',2,1),(3,19,'2023-01-03 15:00:00',3,3),(4,15,'2023-01-04 17:30:00',4,4),(5,5,'2023-01-05 18:30:00',5,2),(6,8,'2023-01-06 20:00:00',6,5);
 /*!40000 ALTER TABLE `bookings` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -66,6 +67,7 @@ CREATE TABLE `customers` (
 
 LOCK TABLES `customers` WRITE;
 /*!40000 ALTER TABLE `customers` DISABLE KEYS */;
+INSERT INTO `customers` VALUES (1,'Peter Jackson','12345678'),(2,'Lois Simpson','23456781'),(3,'Adam Scott','34567812'),(4,'Lesley Perkins','45678123'),(5,'Ann Dwyer','56781234'),(6,'Chris Moltisanti','67812345');
 /*!40000 ALTER TABLE `customers` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -93,62 +95,62 @@ CREATE TABLE `deliveries` (
 
 LOCK TABLES `deliveries` WRITE;
 /*!40000 ALTER TABLE `deliveries` DISABLE KEYS */;
+INSERT INTO `deliveries` VALUES (1,'2023-01-06 17:00:00',5,'delivered');
 /*!40000 ALTER TABLE `deliveries` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `menu`
+-- Table structure for table `menuitems`
 --
 
-DROP TABLE IF EXISTS `menu`;
+DROP TABLE IF EXISTS `menuitems`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `menu` (
-  `menu_id` int NOT NULL,
-  `meal_name` varchar(255) NOT NULL,
-  `meal_type` varchar(45) DEFAULT NULL,
-  `cuisine` varchar(45) DEFAULT NULL,
-  PRIMARY KEY (`menu_id`)
+CREATE TABLE `menuitems` (
+  `item_id` int NOT NULL,
+  `Name` varchar(155) DEFAULT NULL,
+  `Type` varchar(45) DEFAULT NULL,
+  `Price` int DEFAULT NULL,
+  PRIMARY KEY (`item_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `menu`
+-- Dumping data for table `menuitems`
 --
 
-LOCK TABLES `menu` WRITE;
-/*!40000 ALTER TABLE `menu` DISABLE KEYS */;
-/*!40000 ALTER TABLE `menu` ENABLE KEYS */;
+LOCK TABLES `menuitems` WRITE;
+/*!40000 ALTER TABLE `menuitems` DISABLE KEYS */;
+INSERT INTO `menuitems` VALUES (1,'Olives','Starters',5),(2,'Flatbread','Starters',5),(3,'Minestrone','Starters',8),(4,'Tomato bread','Starters',8),(5,'Falafel','Starters',7),(6,'Hummus','Starters',5),(7,'Greek salad','Main Courses',15),(8,'Bean soup','Main Courses',12),(9,'Pizza','Main Courses',15),(10,'Greek yoghurt','Desserts',7),(11,'Ice cream','Desserts',6),(12,'Cheesecake','Desserts',4),(13,'Athens White wine','Drinks',25),(14,'Corfu Red Wine','Drinks',30),(15,'Turkish Coffee','Drinks',10),(16,'Turkish Coffee','Drinks',10),(17,'Kabasa','Main Courses',17);
+/*!40000 ALTER TABLE `menuitems` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `menuorders`
+-- Table structure for table `menus`
 --
 
-DROP TABLE IF EXISTS `menuorders`;
+DROP TABLE IF EXISTS `menus`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `menuorders` (
-  `menu_order_id` int NOT NULL,
-  `order_id` int NOT NULL,
+CREATE TABLE `menus` (
   `menu_id` int NOT NULL,
-  `price` decimal(10,0) DEFAULT NULL,
-  `quantity` int DEFAULT NULL,
-  PRIMARY KEY (`menu_order_id`),
-  KEY `menu_id_idx` (`menu_id`),
-  KEY `order_id_idx` (`order_id`),
-  CONSTRAINT `menu_id_FK` FOREIGN KEY (`menu_id`) REFERENCES `menu` (`menu_id`),
-  CONSTRAINT `order_id_FK2` FOREIGN KEY (`order_id`) REFERENCES `orders` (`order_id`)
+  `menu_name` varchar(255) NOT NULL,
+  `item_id` int DEFAULT NULL,
+  `cuisine` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`menu_id`),
+  KEY `item_id_FK_idx` (`item_id`),
+  CONSTRAINT `item_id_FK` FOREIGN KEY (`item_id`) REFERENCES `menuitems` (`item_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `menuorders`
+-- Dumping data for table `menus`
 --
 
-LOCK TABLES `menuorders` WRITE;
-/*!40000 ALTER TABLE `menuorders` DISABLE KEYS */;
-/*!40000 ALTER TABLE `menuorders` ENABLE KEYS */;
+LOCK TABLES `menus` WRITE;
+/*!40000 ALTER TABLE `menus` DISABLE KEYS */;
+INSERT INTO `menus` VALUES (1,'Number 1',1,'Greek'),(2,'Number 2',7,'Greek'),(3,'Number 3',10,'Greek'),(4,'Number 4',13,'Greek'),(5,'Number 5',3,'Italian'),(6,'Number 6',9,'Italian'),(7,'Number 7',12,'Italian'),(8,'Number 8',15,'Italian'),(9,'Number 9',5,'Turkish'),(10,'Number 10',17,'Turkish'),(11,'Number 11',11,'Turkish'),(12,'Number 12',16,'Turkish');
+/*!40000 ALTER TABLE `menus` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -160,12 +162,15 @@ DROP TABLE IF EXISTS `orders`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `orders` (
   `order_id` int NOT NULL,
-  `order_date` date NOT NULL,
+  `menu_id` int DEFAULT NULL,
   `total_cost` decimal(10,0) DEFAULT NULL,
   `booking_id` int DEFAULT NULL,
+  `quantity` int DEFAULT NULL,
   PRIMARY KEY (`order_id`),
   KEY `booking_id_idx` (`booking_id`),
-  CONSTRAINT `booking_id_FK` FOREIGN KEY (`booking_id`) REFERENCES `bookings` (`booking_id`)
+  KEY `menu_id_FK_idx` (`menu_id`),
+  CONSTRAINT `booking_id_FK` FOREIGN KEY (`booking_id`) REFERENCES `bookings` (`booking_id`),
+  CONSTRAINT `menu_id_FK` FOREIGN KEY (`menu_id`) REFERENCES `menus` (`menu_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -175,8 +180,23 @@ CREATE TABLE `orders` (
 
 LOCK TABLES `orders` WRITE;
 /*!40000 ALTER TABLE `orders` DISABLE KEYS */;
+INSERT INTO `orders` VALUES (1,1,86,1,2),(2,2,37,2,3),(3,2,37,3,1),(5,1,43,5,5);
 /*!40000 ALTER TABLE `orders` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Temporary view structure for view `ordersview`
+--
+
+DROP TABLE IF EXISTS `ordersview`;
+/*!50001 DROP VIEW IF EXISTS `ordersview`*/;
+SET @saved_cs_client     = @@character_set_client;
+/*!50503 SET character_set_client = utf8mb4 */;
+/*!50001 CREATE VIEW `ordersview` AS SELECT 
+ 1 AS `Order ID`,
+ 1 AS `Quantity`,
+ 1 AS `Total cost`*/;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `staff`
@@ -189,6 +209,9 @@ CREATE TABLE `staff` (
   `staff_id` int NOT NULL,
   `full_name` varchar(255) NOT NULL,
   `role` varchar(255) NOT NULL,
+  `address` varchar(255) DEFAULT NULL,
+  `phone_number` int DEFAULT NULL,
+  `email` varchar(100) DEFAULT NULL,
   `salary` decimal(10,0) DEFAULT NULL,
   PRIMARY KEY (`staff_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
@@ -200,8 +223,27 @@ CREATE TABLE `staff` (
 
 LOCK TABLES `staff` WRITE;
 /*!40000 ALTER TABLE `staff` DISABLE KEYS */;
+INSERT INTO `staff` VALUES (1,'Mario Gollini','Manager','724, Parsley Lane, Old Town, Chicago, IL',351258074,'Mario.g@littlelemon.com',70000),(2,'Adrian Gollini','Assistant Manager','334, Dill Square, Lincoln Park, Chicago, IL',351474048,'Adrian.g@littlelemon.com',65000),(3,'Giorgos Dioudis','Head Chef','879 Sage Street, West Loop, Chicago, IL',351970582,'Giorgos.d@littlelemon.com',50000),(4,'Fatma Kaya','Assistant Chef','132  Bay Lane, Chicago, IL',351963569,'Fatma.k@littlelemon.com',45000),(5,'Elena Salvai','Head Waiter','989 Thyme Square, EdgeWater, Chicago, IL',351074198,'Elena.s@littlelemon.com',40000),(6,'John Millar','Receptionist','245 Dill Square, Lincoln Park, Chicago, IL',351584508,'John.m@littlelemon.com',35000);
 /*!40000 ALTER TABLE `staff` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Final view structure for view `ordersview`
+--
+
+/*!50001 DROP VIEW IF EXISTS `ordersview`*/;
+/*!50001 SET @saved_cs_client          = @@character_set_client */;
+/*!50001 SET @saved_cs_results         = @@character_set_results */;
+/*!50001 SET @saved_col_connection     = @@collation_connection */;
+/*!50001 SET character_set_client      = utf8mb4 */;
+/*!50001 SET character_set_results     = utf8mb4 */;
+/*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
+/*!50001 CREATE ALGORITHM=UNDEFINED */
+/*!50013 DEFINER=`little_lemon_admin`@`%` SQL SECURITY DEFINER */
+/*!50001 VIEW `ordersview` AS select `orders`.`order_id` AS `Order ID`,`orders`.`quantity` AS `Quantity`,`orders`.`total_cost` AS `Total cost` from `orders` where (`orders`.`quantity` > 1) */;
+/*!50001 SET character_set_client      = @saved_cs_client */;
+/*!50001 SET character_set_results     = @saved_cs_results */;
+/*!50001 SET collation_connection      = @saved_col_connection */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -212,4 +254,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-03-08 13:48:54
+-- Dump completed on 2023-03-10 12:02:42
